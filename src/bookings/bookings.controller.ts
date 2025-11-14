@@ -7,10 +7,11 @@ import {
   Param,
   HttpStatus,
 } from '@nestjs/common';
-import { CreateBookingDto } from './dto/database.dto';
+import { CreateBookingDto, ReserveDto } from './dto/database.dto';
 import { BookingService } from './bookings.service';
 import { IBookingsPayload } from './interfaces';
 import { ReserveService } from './reserve.service';
+import { ApiParam, ApiOperation } from '@nestjs/swagger';
 
 @Controller('bookings')
 export class BookingsController {
@@ -19,6 +20,7 @@ export class BookingsController {
     private readonly reserverService: ReserveService,
   ) {}
 
+  @ApiOperation({ summary: 'Список всех пользователей' })
   @Get('user/all')
   async userList(): Promise<IBookingsPayload> {
     const users = await this.bookingsService.findAll();
@@ -30,6 +32,8 @@ export class BookingsController {
     };
   }
 
+  @ApiOperation({ summary: 'Найти пользователя по ID' })
+  @ApiParam({ name: 'userId', description: 'ID пользователя (booking)' })
   @Get('user/:id')
   async findUser(@Param('userId') userId: string): Promise<IBookingsPayload> {
     const user = await this.bookingsService.findOne(userId);
@@ -48,6 +52,7 @@ export class BookingsController {
     };
   }
 
+  @ApiOperation({ summary: 'Создать нового пользователя' })
   @Post('user/create')
   @HttpCode(HttpStatus.CREATED)
   async createUser(
@@ -70,13 +75,11 @@ export class BookingsController {
     };
   }
 
+  @ApiOperation({ summary: 'Зарегистрироваться на событие' })
   @Post('reserve')
   async reserve(
     @Body()
-    body: {
-      eventId: number;
-      userId: string;
-    },
+    body: ReserveDto,
   ): Promise<IBookingsPayload> {
     const { eventId, userId } = body;
     const result = await this.reserverService.reserve(eventId, userId);

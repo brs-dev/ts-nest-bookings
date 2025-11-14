@@ -11,11 +11,13 @@ import {
 import { CreateEventDto } from './dto/database.dto';
 import { EventsService } from './events.service';
 import { IBookingsPayload } from './interfaces';
+import { ApiParam, ApiOperation } from '@nestjs/swagger';
 
 @Controller('events')
 export class EventsController {
   constructor(private readonly eventService: EventsService) {}
 
+  @ApiOperation({ summary: 'Список всех событий' })
   @Get('all')
   async eventList(): Promise<IBookingsPayload> {
     const events = await this.eventService.findAll();
@@ -26,6 +28,8 @@ export class EventsController {
     };
   }
 
+  @ApiOperation({ summary: 'Найти событие по ID' })
+  @ApiParam({ name: 'id', description: 'ID события' })
   @Get(':id')
   async findEvent(
     @Param('id', ParseIntPipe) id: number,
@@ -46,6 +50,7 @@ export class EventsController {
     };
   }
 
+  @ApiOperation({ summary: 'Создать новое событие' })
   @Post('create')
   @HttpCode(HttpStatus.CREATED)
   async createEvent(
